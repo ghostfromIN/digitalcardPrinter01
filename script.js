@@ -1,25 +1,24 @@
-// Dictionary for standard Aadhaar prefixes
+// Dictionary for standard prefixes
 const PREFIX_MAP = {
-    "s/o": "आत्मज:",
-    "d/o": "आत्मजा:",
-    "w/o": "पत्नी:",
-    "c/o": "मार्फत:",
-    "so": "आत्मज:",
-    "do": "आत्मजा:",
-    "wo": "पत्नी:",
-    "co": "मार्फत:"
+    "s/o": "आत्मज: ",
+    "so:": "आत्मज: ",
+    "s/o:": "आत्मज: ",
+    "d/o": "आत्मजा: ",
+    "do:": "आत्मजा: ",
+    "d/o:": "आत्मजा: ",
+    "w/o": "पत्नी: ",
+    "wo:": "पत्नी: ",
+    "w/o:": "पत्नी: ",
+    "c/o": "मार्फत: ",
+    "co:": "मार्फत: ",
+    "c/o:": "सी/ओ: "
 };
 
-// Google Input Tools Transliterate API single token
+// Transliterate single non-prefix token
 async function transliterateToken(word) {
     if (!word.trim()) return word;
 
-    const lower = word.toLowerCase().trim();
-    if (PREFIX_MAP[lower]) {
-        return PREFIX_MAP[lower];
-    }
-
-    // Number, pure symbols, ya alphanumeric codes (eg: C-147, B-12, 110094) ko direct preserve karein
+    // Alphanumeric codes, pure numbers, plot numbers (eg: C-147, B-12, 110094) directly preserve
     if (/^[0-9]+$/.test(word) || /^[a-zA-Z]-[0-9]+$/i.test(word) || /^[a-zA-Z0-9]+[0-9]+[a-zA-Z0-9]*$/.test(word)) {
         return word;
     }
@@ -37,16 +36,25 @@ async function transliterateToken(word) {
     return word;
 }
 
-// Tokenize text keeping spaces, punctuation, commas intact
+// Tokenize text keeping commas, punctuation and spaces clean
 async function transliterateSentence(text) {
     if (!text) return "";
 
-    // Split words while preserving delimiters (spaces, commas, colons, slashes)
-    const tokens = text.split(/([ \t\n,:\/]+)/);
+    let processedText = text;
+
+    // Prefixes (S/O, D/O, W/O, C/O) ko pehle hi match karke replace karein
+    for (const [key, replacement] of Object.entries(PREFIX_MAP)) {
+        const regex = new RegExp(`(^|[\\s,])(${key.replace("/", "\\/")})\\s*`, "gi");
+        processedText = processedText.replace(regex, `$1${replacement}`);
+    }
+
+    // Ab baaki text ko tokenize karein
+    const tokens = processedText.split(/([ \t\n,:]+)/);
 
     const convertedTokens = await Promise.all(
         tokens.map(async (token) => {
-            if (/^[ \t\n,:\/]+$/.test(token) || !token.trim()) {
+            // Agar pehle se Hindi me converted prefix, space, ya delimiter ho toh skip karein
+            if (/^[ \t\n,:]+$/.test(token) || /[\u0900-\u097F]/.test(token) || !token.trim()) {
                 return token;
             }
             return await transliterateToken(token);
@@ -82,6 +90,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const dispDob = document.getElementById("disp-dob");
     const dispGender = document.getElementById("disp-gender");
     const dispNumber = document.getElementById("disp-number");
+    const dispNumberBack = document.getElementById("disp-number-back");
     const dispAddrHi = document.getElementById("disp-addr-hi");
     const dispAddrEn = document.getElementById("disp-addr-en");
 
@@ -102,7 +111,7 @@ document.addEventListener("DOMContentLoaded", () => {
         addrHi.value = await transliterateSentence(val);
     }));
 
-    // 12-digit formatting
+    // Card Number spacing (XXXX XXXX XXXX)
     numberInput.addEventListener("input", (e) => {
         let val = e.target.value.replace(/\D/g, "").substring(0, 12);
         let formatted = val.match(/.{1,4}/g)?.join(" ") || val;
@@ -127,7 +136,11 @@ document.addEventListener("DOMContentLoaded", () => {
         dispNameHi.innerText = nameHi.value.trim() || "नाम";
         dispDob.innerText = dobInput.value.trim() || "DD/MM/YYYY";
         dispGender.innerText = genderInput.value;
-        dispNumber.innerText = numberInput.value.trim() || "[12-Digit Number]";
+        
+        const cardNum = numberInput.value.trim() || "[12-Digit Number]";
+        dispNumber.innerText = cardNum;
+        dispNumberBack.innerText = cardNum; // Back card par bhi set
+
         dispAddrEn.innerText = addrEn.value.trim() || "Address Line...";
         dispAddrHi.innerText = addrHi.value.trim() || "पता...";
 
