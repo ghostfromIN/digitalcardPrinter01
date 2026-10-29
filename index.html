@@ -4,12 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YHGIndian - Card Generator</title>
+    <title>Prashant sharma - Card Generator</title>
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap"
+        rel="stylesheet">
 
     <link rel="stylesheet" href="styles.css">
     <script src="script.js" defer></script>
@@ -57,12 +59,14 @@
 
             <div class="form-group full-width">
                 <label>Address (English)</label>
-                <textarea id="in-addr-en" rows="2" placeholder="S/O: Name, Flat/House No., Area, City, State - PIN"></textarea>
+                <textarea id="in-addr-en" rows="2"
+                    placeholder="S/O: Name, Flat/House No., Area, City, State - PIN"></textarea>
             </div>
 
             <div class="form-group full-width">
                 <label>Address (Hindi - Auto Generated)</label>
-                <textarea id="in-addr-hi" rows="2" placeholder="आत्मज: नाम, मकान नं., क्षेत्र, शहर, राज्य - पिन"></textarea>
+                <textarea id="in-addr-hi" rows="2"
+                    placeholder="आत्मज: नाम, मकान नं., क्षेत्र, शहर, राज्य - पिन"></textarea>
             </div>
         </div>
 
@@ -75,15 +79,17 @@
         <button class="btn-success" id="btn-print">Print / Save as PDF</button>
     </div>
 
-    <!-- 3. Generated Card Wrapper -->
+    <!-- Generated Card Wrapper -->
     <div class="card-wrapper" id="card-wrapper" style="display: none;">
         <img src="final.jpg" alt="Aadhaar Template" class="template-bg">
 
         <div class="overlay-layer">
+            <!-- 3:4 User Photo (Top Front Card) -->
             <div class="user-photo-box">
                 <img src="" id="disp-photo" alt="Photo">
             </div>
 
+            <!-- Front Card Details -->
             <div class="user-details-box">
                 <div class="name-hi" id="disp-name-hi"></div>
                 <div class="name-en" id="disp-name-en"></div>
@@ -91,12 +97,21 @@
                 <div class="detail-gender" id="disp-gender"></div>
             </div>
 
+            <!-- Front Card Number -->
             <div class="aadhaar-number-box">
                 <span id="disp-number"></span>
             </div>
 
+            <!-- Back Card: Hindi Address -->
             <div class="user-address-hi" id="disp-addr-hi"></div>
+
+            <!-- Back Card: English Address -->
             <div class="user-address-en" id="disp-addr-en"></div>
+
+            <!-- Back Card Number (Bottom Ribbon ke theek upar) -->
+            <div class="aadhaar-number-box-back">
+                <span id="disp-number-back"></span>
+            </div>
         </div>
     </div>
 
